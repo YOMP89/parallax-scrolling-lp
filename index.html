@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parallax Landing Page</title>
+    <style>
+        :root {
+            --section-height: 100vh;
+            --color-primary: #2c3e50;
+            --color-secondary: #34495e;
+            --color-accent: #e74c3c;
+            --text-light: #ecf0f1;
+            --parallax-speed-1: 0.5;
+            --parallax-speed-2: 0.7;
+            --parallax-speed-3: 0.9;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .parallax-container {
+            perspective: 1px;
+            height: 100vh;
+            overflow-x: hidden;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        .parallax-section {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            height: var(--section-height);
+            padding: 2rem;
+            transform-style: preserve-3d;
+            color: var(--text-light);
+            text-align: center;
+        }
+
+        .parallax-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: -1;
+            transform-origin: center;
+        }
+
+        .section-1 .parallax-bg {
+            background: linear-gradient(45deg, var(--color-primary), var(--color-accent));
+            transform: translateZ(-1px) scale(2);
+        }
+
+        .section-2 .parallax-bg {
+            background: linear-gradient(135deg, var(--color-secondary), var(--color-primary));
+            transform: translateZ(-0.5px) scale(1.5);
+        }
+
+        .section-3 .parallax-bg {
+            background: linear-gradient(225deg, var(--color-accent), var(--color-secondary));
+            transform: translateZ(-0.25px) scale(1.25);
+        }
+
+        .content {
+            transform: translateZ(0);
+            max-width: 800px;
+            padding: 2rem;
+            background-color: rgba(0, 0, 0, 0.6);
+            border-radius: 1rem;
+            backdrop-filter: blur(5px);
+        }
+
+        h2 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        p {
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .scroll-indicator {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            color: var(--text-light);
+            font-size: 2rem;
+            animation: bounce 2s infinite;
+            cursor: pointer;
+            z-index: 100;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0) translateX(-50%);
+            }
+            40% {
+                transform: translateY(-30px) translateX(-50%);
+            }
+            60% {
+                transform: translateY(-15px) translateX(-50%);
+            }
+        }
+
+        @media (max-width: 768px) {
+            h2 {
+                font-size: 2rem;
+            }
+
+            p {
+                font-size: 1rem;
+            }
+
+            .content {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="parallax-container">
+        <section class="parallax-section section-1">
+            <div class="parallax-bg"></div>
+            <div class="content">
+                <h2>Bienvenido al Futuro</h2>
+                <p>Descubre una nueva forma de interactuar con el contenido web. El efecto parallax crea una experiencia inmersiva y única que cautiva a los usuarios desde el primer momento.</p>
+            </div>
+        </section>
+
+        <section class="parallax-section section-2">
+            <div class="parallax-bg"></div>
+            <div class="content">
+                <h2>Innovación sin Límites</h2>
+                <p>Nuestra tecnología de vanguardia combina diseño elegante con funcionalidad intuitiva. Cada scroll revela una nueva capa de contenido cuidadosamente diseñada.</p>
+            </div>
+        </section>
+
+        <section class="parallax-section section-3">
+            <div class="parallax-bg"></div>
+            <div class="content">
+                <h2>Únete a la Revolución</h2>
+                <p>Sé parte de algo más grande. Nuestra comunidad está creciendo y transformando la manera en que interactuamos con la tecnología.</p>
+            </div>
+        </section>
+    </div>
+
+    <div class="scroll-indicator">↓</div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const parallaxContainer = document.querySelector('.parallax-container');
+            const scrollIndicator = document.querySelector('.scroll-indicator');
+            let lastScrollTop = 0;
+
+            // Función para manejar el efecto parallax suave
+            function handleParallax() {
+                const scrolled = parallaxContainer.scrollTop;
+                const sections = document.querySelectorAll('.parallax-section');
+
+                sections.forEach((section, index) => {
+                    const speed = 1 - (index * 0.2);
+                    const yPos = -(scrolled * speed);
+                    section.querySelector('.parallax-bg').style.transform = 
+                        `translateZ(${-1 * speed}px) scale(${1 + speed})`;
+                });
+
+                // Ocultar/mostrar indicador de scroll
+                if (scrolled > lastScrollTop) {
+                    scrollIndicator.style.opacity = '0';
+                } else if (scrolled < 100) {
+                    scrollIndicator.style.opacity = '1';
+                }
+                lastScrollTop = scrolled;
+            }
+
+            // Suavizar el scroll
+            parallaxContainer.addEventListener('scroll', () => {
+                requestAnimationFrame(handleParallax);
+            });
+
+            // Hacer clic en el indicador de scroll
+            scrollIndicator.addEventListener('click', () => {
+                parallaxContainer.scrollTo({
+                    top: parallaxContainer.scrollTop + window.innerHeight,
+                    behavior: 'smooth'
+                });
+            });
+
+            // Efecto de aparición gradual al cargar
+            document.querySelectorAll('.content').forEach((content, index) => {
+                setTimeout(() => {
+                    content.style.opacity = '0';
+                    content.style.transition = 'opacity 1s ease-in-out';
+                    content.style.opacity = '1';
+                }, index * 500);
+            });
+        });
+    </script>
+</body>
+</html>
